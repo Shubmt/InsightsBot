@@ -20,7 +20,6 @@ origins = [
 ]
 
 app = FastAPI()
-database_manager = DatabaseManager("postgresql://postgres:postgres@localhost/prostgres")
 
 engine = create_engine('postgresql://postgres:postgres@localhost/prostgres')
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

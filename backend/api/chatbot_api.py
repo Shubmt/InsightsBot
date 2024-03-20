@@ -9,40 +9,42 @@ class Response(BaseModel):
 
 chatbot_router = APIRouter(prefix="/chatbot", tags=["chatbot"])
 
+
+class InputQuestion(BaseModel):
+    question: str
+
 class ChatbotApi:
+    CHATBOT = None
 
-    def __init__(self) -> None:
-        self.chatbot = None
-
+    
     @chatbot_router.get("/initialize", response_model = Response)
-    async def initialize(self, request: Request):
-        if self.chatbot:
+    async def initialize(request: Request):
+        if ChatbotApi.CHATBOT:
             return  {"result": "chatbot already initialized"}
-        self.chatbot = LLMChatbot()
+        ChatbotApi.CHATBOT = LLMChatbot()
         return {"result": "ok"}
     
 
     @chatbot_router.post("/upload_file", response_model = Response)
-    async def upload_file(self, request: Request, file: UploadFile):
+    async def upload_file(request: Request, file: UploadFile):
 
         form = await request.form()
         file = form.get("file")
         file_path = await save_uploaded_file(file)
-        self.chatbot.set_or_update_context(file_path)
+        ChatbotApi.CHATBOT.set_or_update_context(file_path)
         return {"result": "ok"}
 
 
     @chatbot_router.post("/clear-context", response_model=str)
-    async def clear_context(self, request: Request):
-        self.chatbot.clear_context()
+    async def clear_context(request: Request):
+        ChatbotApi.CHATBOT.clear_context()
         return {"result": "ok"}
 
 
     @chatbot_router.post("/predict", response_model = Response)
-    async def predict(self, request: Request):
-
-        form = await request.form()
-        question = form.get("question") 
-        answer = self.chatbot.answer_question(question)
+    async def predict(request: Request, question: InputQuestion):
+        # form = await request.form()
+        # question = form.get("question") 
+        answer = ChatbotApi.CHATBOT.answer_question(question.question)
         return {"result": answer}
 
