@@ -1,20 +1,17 @@
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request, UploadFile, File
+from fastapi import FastAPI, Request, UploadFile, File, APIRouter
 from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from typing import Any
 from .document_processor import DocumentProcessor
-from .llm_chatbot import LLMChatbot
 from .database_manager import DatabaseManager
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from .api.chatbot_api import chatbot_router
 
 load_dotenv()
 
-class Response(BaseModel):
-    result: str | None
 
 origins = [
     "http://localhost",
@@ -34,42 +31,8 @@ app.add_middleware(
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
 )
 
-chatbot = LLMChatbot()
-
-async def save_uploaded_file(file: UploadFile = File(...), destination: str = "C:/Users/shbhm/Downloads/llm-assignment-master/llm-assignment-master/backend/assets"):
-    file_path = f"{destination}/{file.filename}"
-    with open(file_path, "wb") as new_file:
-        new_file.write(await file.read())
-    return file_path
 
 
-@app.post("/upload_file", response_model = Response)
-async def upload_file(request: Request, file: UploadFile) -> Any:
-
-    form = await request.form()
-    file = form.get("file")
-    file_path = await save_uploaded_file(file)
-    chatbot.set_or_update_context(file_path)
-    return {"result": "ok"}
-
-
-@app.post("/clear-context", response_model=str)
-async def clear_context(request: Request) -> Any:
-    chatbot.clear_context()
-    return {"result": "ok"}
-
-# @app.post("/intialize-llm", response_model=str)
-# async def initialize_LLM(request: Request) -> Any:
-#     chatbot.initialize_LLM()
-#     return {"result": "ok"}
-
-@app.post("/predict", response_model = Response)
-async def predict(request: Request) -> Any:
-
-    form = await request.form()
-    question = form.get("question") 
-    answer = chatbot.answer_question(question)
-    return {"result": answer}
+app.include_router(chatbot_router)
