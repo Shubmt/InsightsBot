@@ -10,25 +10,33 @@ from langchain.vectorstores.faiss import FAISS
 
 class DocumentProcessor():
     def __init__(self):
-        self.vecorDB = None
-        self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={'device': 'cpu'})
+        self.vectorDB = None
+        self.embeddings = self._set_embeddngs()
 
-    def process_documents(self, file_path: str, new_context=False):
-        if new_context:
-            self.vecorDB = None
+    def process_document(self, file_path: str):
+        documents = self._preprocess_document(file_path=file_path)
+        self._create_or_update_db(documents)    
+        
+        return self.vectorDB
+    
+    def _set_embeddngs(self):
+        return HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={'device': 'cpu'})
 
+    def _preprocess_document(self, file_path: str):
         loader = UnstructuredAPIFileLoader(file_path=file_path, api_key='BNVlgWXMVO0whIKPc1xVWK0atGxNR2')
-        documents = loader.load()
-        print(documents)
+        doc = loader.load()
         splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-        texts = splitter.split_documents(documents)
-
-        if self.vecorDB:
-            self.vecorDB.add_documents(texts)
+        documents = splitter.split_documents(doc)
+        return documents
+    
+    def _create_or_update_db(self, documents):
+        if self.vectorDB:
+            self.vectorDB.add_documents(documents)
         else:
-            self.vecorDB = FAISS.from_documents(texts, self.embeddings)
-        self.vecorDB.save_local("faiss")
-        return self.vecorDB
+            self.vectorDB = FAISS.from_documents(documents, self.embeddings)
+        self.vectorDB.save_local("faiss")
+
+
 
 
         

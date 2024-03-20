@@ -47,20 +47,24 @@ async def save_uploaded_file(file: UploadFile = File(...), destination: str = "C
 
 
 @app.post("/upload_file", response_model = Response)
-async def upload_file(request: Request) -> Any:
+async def upload_file(request: Request, file: UploadFile) -> Any:
 
     form = await request.form()
     file = form.get("file")
     file_path = await save_uploaded_file(file)
-    chatbot.generate_vectorDB(file_path)
+    chatbot.set_or_update_context(file_path)
+    return {"result": "ok"}
+
 
 @app.post("/clear-context", response_model=str)
 async def clear_context(request: Request) -> Any:
     chatbot.clear_context()
+    return {"result": "ok"}
 
-@app.post("/intialize-llm", response_model=str)
-async def initialize_LLM(request: Request) -> Any:
-    chatbot.initialize_LLM()
+# @app.post("/intialize-llm", response_model=str)
+# async def initialize_LLM(request: Request) -> Any:
+#     chatbot.initialize_LLM()
+#     return {"result": "ok"}
 
 @app.post("/predict", response_model = Response)
 async def predict(request: Request) -> Any:
