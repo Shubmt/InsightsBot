@@ -13,6 +13,4 @@ class UploadedFiles(Base):
 
     def __repr__(self):
         return f"<UploadedFile(id={self.id}, file_name={self.file_name}, file_path={self.file_path}, vector_folder_path={self.vector_folder_path})>"
-    
-    def add_file_path(file_name, file_path, vector_folder_path):
         
