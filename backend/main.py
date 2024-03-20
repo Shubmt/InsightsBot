@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Any
@@ -29,14 +29,17 @@ app.add_middleware(
 
 
 @app.post("/predict", response_model = Response)
-def predict() -> Any:
-  
+async def predict(request: Request) -> Any:
+
+    form = await request.form()
+    question = form.get("question")
+    
     vectorDB = DocumentProcessor(['C:/Users/shbhm/Downloads/llm-assignment-master/llm-assignment-master/backend/assets/info.txt'])
-    db = vectorDB.process_documents()
+    db = vectorDB.process_documents()   
     model_path = 'C:/Users/shbhm/Downloads/llm-assignment-master/llm-assignment-master/backend/llama-2-7b-chat.ggmlv3.q3_K_M.bin'
     db_path = './faiss'
     document_qa = LLMChatbot(model_path, db)
-    question = "Who is the author of FftSharp? What is their favorite color?"
+
     answer = document_qa.answer_question(question)
     print(answer)
   
