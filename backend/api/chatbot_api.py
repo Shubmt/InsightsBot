@@ -49,7 +49,7 @@ class ChatbotApi:
         return {"result": "ok"}
 
 
-    @chatbot_router.post("/clear-context", response_model=str)
+    @chatbot_router.post("/clear-context", response_model=Response)
     async def clear_context(request: Request):
         ChatbotApi.CHATBOT.clear_context()
         return {"result": "ok"}

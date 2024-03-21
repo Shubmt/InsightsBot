@@ -1,6 +1,4 @@
 from langchain.llms.ctransformers import CTransformers
-from langchain.embeddings.huggingface import HuggingFaceEmbeddings
-from langchain.vectorstores.faiss import FAISS
 from langchain.prompts import PromptTemplate
 from langchain.chains.retrieval_qa.base import RetrievalQA
 
@@ -52,6 +50,7 @@ class LLMChatbot:
 
     def answer_question(self, question: str) -> str:
         if self.doc_processor.vectorDB is None:
-            raise Exception("File context not set yet.")
+            # raise Exception("File context not set yet.")
+            return "File context not set yet."
         output = self.qa_llm({'query': question})
         return output["result"] 

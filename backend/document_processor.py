@@ -12,15 +12,15 @@ class DocumentProcessor():
     def __init__(self):
         self.vectorDB = None
         self.embeddings = self._set_embeddngs()
-
+    
+    def _set_embeddngs(self):
+        return HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={'device': 'cpu'})
+    
     def process_document(self, file_path: str):
         documents = self._preprocess_document(file_path=file_path)
         self._create_or_update_db(documents)    
         
         return self.vectorDB
-    
-    def _set_embeddngs(self):
-        return HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={'device': 'cpu'})
 
     def _preprocess_document(self, file_path: str):
         loader = UnstructuredAPIFileLoader(file_path=file_path, api_key='BNVlgWXMVO0whIKPc1xVWK0atGxNR2')
