@@ -64,7 +64,7 @@ const ChatPage = () => {
         const updated_response = [
             { role: 'system', content: answer },
         ]
-        setMessages([...messages, ...updated_response]);
+        setMessages([...messages, ...new_messages, ...updated_response]);
     } catch (error) {
       console.error(error);
     }
