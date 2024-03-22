@@ -23,11 +23,11 @@ chat-page {
 }
 
 message {
-  margin-bottom: 18px;
+  margin-bottom: 30px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  width: 100%;
+  width: 50%;
 }
 
 message-text {
@@ -39,11 +39,13 @@ message-text {
 }
 
 user {
+  margin-bottom: 30px;
   justify-content: flex-end;
   text-align: left;
 }
 
 system {
+  margin-bottom: 30px;
   justify-content: flex-start;
   text-align: right;
 }

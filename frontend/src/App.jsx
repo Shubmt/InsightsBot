@@ -14,6 +14,7 @@ const ChatPage = () => {
     { role: 'system', content: '2. Upload some files' },
     { role: 'system', content: '3. Ask Questions' },
   ]);
+//   const [chatbotAnswer, setChatbotAnswer] = useState([{ role: 'system', content: 'chatbot predicts...' }]);
   const [file, setFile] = useState(null);
 
   const handleFileUpload = async () => {
@@ -48,18 +49,22 @@ const ChatPage = () => {
 
   const handleSubmit = async () => {
     try {
-      setShowLoader(true);
-      const res = await axios.post('http://localhost:8000/chatbot/predict', {
-          question: inputValue
-        }
-      );
-      setShowLoader(false);
-      const new_messages = res.data.map(message => ({
-        role: 'system',
-        content: message
-      }));
-      setMessages([...messages, ...new_messages]);
-      setInputValue('');
+        const new_messages = [
+            { role: 'user', content: inputValue },
+          ]
+        setInputValue('');  
+        setMessages([...messages, ...new_messages]);
+        setShowLoader(true);
+        const res = await axios.post('http://localhost:8000/chatbot/predict', {
+            question: inputValue
+            }
+        );
+        setShowLoader(false);
+        const answer = res.data.result
+        const updated_response = [
+            { role: 'system', content: answer },
+        ]
+        setMessages([...messages, ...updated_response]);
     } catch (error) {
       console.error(error);
     }
@@ -110,7 +115,7 @@ const ChatPage = () => {
 
 
   return (
-    <div style={{ marginLeft: 300, }}>
+    <div style={{ marginLeft: 250, marginRight: 250}}>
       <Card className="chat-page">
         <div style={{display: 'flex', justifyContent: 'center'}}>
           <Title level={2} className="welcome-text">Welcome to Proton GPT</Title>
@@ -170,11 +175,10 @@ const ChatPage = () => {
           padding: 20,
           paddingTop: 5,
           position: 'fixed',
-          left: 280,
+          left: 240,
           bottom: 0,
-          right: 0,
+          right: 240,
           backgroundColor: 'white',
-          borderTop: '1px solid #eee'
         }}>
           <Input
             value={inputValue}
