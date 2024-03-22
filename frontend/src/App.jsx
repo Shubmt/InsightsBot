@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Input, Button, Typography, Card, Divider, Upload, message } from 'antd';
-import { ArrowUpOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
+import { UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 const { Title, Text } = Typography;
 
 const ChatPage = () => {
   const [inputValue, setInputValue] = useState('');
-  const [showLoader, setShowLoader] = useState(true);
+  const [showLoader, setShowLoader] = useState(false);
   const [messages, setMessages] = useState([
     { role: 'system', content: '1. Click on Activate Proton GPT button' },
     { role: 'system', content: '2. Upload some files' },
@@ -19,7 +20,9 @@ const ChatPage = () => {
     const formData = new FormData();
     formData.append('file', file);
     try {
-      await axios.post('http://localhost:8000/chatbot/upload-file', formData);
+        setShowLoader(true);
+      await axios.post('http://localhost:8000/chatbot/upload_file', formData);
+      setShowLoader(false);
       message.success('File uploaded successfully.');
     } catch (error) {
       message.error('File upload failed.');
@@ -27,35 +30,43 @@ const ChatPage = () => {
   };
 
   const handleActivate = async () => {
-    const new_messages = [
-      { role: 'user', content: "Activate Proton GPT" },
-      { role: 'system', content: "Activating..." }
-    ]
-    setMessages([...messages, ...new_messages]);
-    try {
-      const response = await axios.get('http://localhost:8000/chatbot/initialize');
-      const final_message = [{ role: 'user', content: "Activate Proton GPT" },
-      { role: 'system', content: "Activating..." },
-      { role: 'system', content: "ProtonGPT Activated!" }]
-      setMessages([...messages, final_message]);
-      message.success('Proton GPT activated.');
-    } catch (error) {
-      const final_message = { role: 'system', content: "Failed to activate Proton GPT." }
-      setMessages([...messages, final_message]);
-      message.error('Failed to activate Proton GPT.');
-    }
-  };
+        try {
+          setShowLoader(true);
+          await axios.get('http://localhost:8000/chatbot/initialize');
+          const new_messages = [
+            { role: 'user', content: "Activate Proton GPT" },
+            { role: 'system', content: "Activated. Ready to use now." },
+            { role: 'system', content: "Kindly upload a file to get started" }
+          ]
+          setMessages([...messages, ...new_messages]);
+          message.success('Proton GPT activated.');
+          setShowLoader(false);
+        } catch (error) {
+          message.error('Failed to activate Proton GPT.');
+        }
+      };
 
-  const handleSubmit = () => {
-    setShowLoader(false);
-    const newMessage = { role: 'user', content: inputValue };
-    setMessages([...messages, newMessage]);
-    setInputValue('');
+  const handleSubmit = async () => {
+    try {
+      setShowLoader(true);
+      const res = await axios.post('http://localhost:8000/chatbot/predict', {
+          question: inputValue
+        }
+      );
+      setShowLoader(false);
+      const new_messages = res.data.map(message => ({
+        role: 'system',
+        content: message
+      }));
+      setMessages([...messages, ...new_messages]);
+      setInputValue('');
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const uploadProps = {
     name: 'file',
-    multiple: false,
     beforeUpload: (file) => {
       const allowedExt = ['.pdf', '.csv', '.txt', '.docx'];
       const { type, name } = file;
@@ -63,11 +74,14 @@ const ChatPage = () => {
       if (!allowedExt.includes(ext)) {
         message.error(`Only ${allowedExt.join(', ')} files are supported.`);
       }
-      const isLt2M = file.size / 1024 / 1024 < 2;
-      if (!isLt2M) {
-        message.error('File must be smaller than 2MB.');
+      const isLt10M = file.size / 1024 / 1024 < 10;
+      if (!isLt10M) {
+        message.error('File must be smaller than 10MB.');
       }
-      return allowedExt.includes(ext) && isLt2M;
+    //   return allowedExt.includes(ext) && isLt10M;
+    //   return false;
+      setFile(file);
+      return false;
     },
     onChange: (info) => {
       const { status } = info.file;
@@ -96,24 +110,19 @@ const ChatPage = () => {
 
 
   return (
-    <div style={{ marginLeft: 150, marginRight: 150}}>
+    <div style={{ marginLeft: 300, }}>
       <Card className="chat-page">
         <div style={{display: 'flex', justifyContent: 'center'}}>
           <Title level={2} className="welcome-text">Welcome to Proton GPT</Title>
         </div>
-        {/* <div style={{display: 'flex', justifyContent: 'center', marginTop: 20}}>
-          <Button className="activate-button" type="primary" onClick={handleActivate}>
-            Activate Proton GPT
-          </Button>
-        </div> */}
 
         
         <div style={{display: 'flex', justifyContent: 'space-between'}}>
         
           <Upload {...uploadProps}>
-            <Button style={{marginRight: 10}} icon={<PlusOutlined />}>Browse File</Button>
-            <Button className="upload-button" onClick={handleFileUpload} type="primary">Upload File</Button>
+            <Button style={{marginRight: 10}} icon={<UploadOutlined  />}>Browse File</Button>
           </Upload>
+          <Button className="upload-button" onClick={handleFileUpload} type="primary">Upload File</Button>
           
           <Button className="activate-button" type="primary" onClick={handleActivate}>
             Activate Proton GPT
@@ -142,9 +151,9 @@ const ChatPage = () => {
 
           <div className='message' style={{ display: 'flex', alignItems: 'center', marginTop: 20}}>
             {/* <Text level={4} className={"message-text"} style={{ flex: 1, textAlign: 'left' }}>abcd</Text> */}
-            <TypingLoader show={showLoader} />
-            {/* <div className="dot-flashing" style={{ marginLeft: 20, display: true ? 'block' : 'none' }}>
-            </div> */}
+            {/* <TypingLoader show={showLoader} /> */}
+            <div className="dot-flashing" style={{ marginLeft: 20, display: showLoader ? 'block' : 'none' }}>
+            </div>
           </div>
         </div>
  
@@ -161,10 +170,11 @@ const ChatPage = () => {
           padding: 20,
           paddingTop: 5,
           position: 'fixed',
-          left: 135,
-          right: 135,
+          left: 280,
           bottom: 0,
+          right: 0,
           backgroundColor: 'white',
+          borderTop: '1px solid #eee'
         }}>
           <Input
             value={inputValue}
@@ -176,7 +186,7 @@ const ChatPage = () => {
                 className="chat-submit-button"
                 type="primary"
                 onClick={handleSubmit}
-                icon={<ArrowUpOutlined />}
+                icon={<PlusOutlined />}
               >
                 Submit
               </Button>
