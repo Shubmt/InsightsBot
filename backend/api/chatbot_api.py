@@ -11,9 +11,6 @@ class Response(BaseModel):
 
 chatbot_router = APIRouter(prefix="/chatbot", tags=["chatbot"])
 
-class InputQuestion(BaseModel):
-    question: str
-
 
 async def save_file_in_db(file_name, file_path):
     try:
@@ -56,9 +53,9 @@ class ChatbotApi:
 
 
     @chatbot_router.post("/predict", response_model = Response)
-    async def predict(request: Request, question: InputQuestion):
-        # form = await request.form()
-        # question = form.get("question") 
-        answer = ChatbotApi.CHATBOT.answer_question(question.question)
+    async def predict(request: Request):
+        data = await request.json()
+        question = data.get('question')
+        answer = ChatbotApi.CHATBOT.answer_question(question)
         return {"result": answer}
-
+        
