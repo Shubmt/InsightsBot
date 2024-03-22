@@ -122,16 +122,16 @@ const ChatPage = () => {
         </div>
 
         
-        <div style={{display: 'flex', justifyContent: 'space-between'}}>
-        
-          <Upload {...uploadProps}>
-            <Button style={{marginRight: 10}} icon={<UploadOutlined  />}>Browse File</Button>
-          </Upload>
-          <Button className="upload-button" onClick={handleFileUpload} type="primary">Upload File</Button>
-          
-          <Button className="activate-button" type="primary" onClick={handleActivate}>
+        <div style={{display: 'flex', justifyContent: 'center', marginBottom: 20}}>   
+        <Button className="activate-button" type="primary" size='large' onClick={handleActivate}>
             Activate Proton GPT
-          </Button>
+        </Button>
+        </div>
+        <div style={{display: 'flex', marginTop: '10px', justifyContent: 'center'}}>
+        <Upload {...uploadProps}>
+            <Button style={{marginRight: 10}} icon={<PlusOutlined  />}>Browse File</Button>
+          </Upload>
+          <Button style={{backgroundColor: 'green'}} className="upload-button" onClick={handleFileUpload} type="primary" icon={<UploadOutlined  />}>Upload File</Button>
         </div>
         
         <Divider />
