@@ -104,6 +104,8 @@ To host the chatbot publicly.
 
 - `npm start`
 
+#### Postman Collection available at - /backend/ChatbotLLM.postman_collection (1).json
+
 
 
 
