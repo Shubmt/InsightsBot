@@ -1,0 +1,129 @@
+{
+	"info": {
+		"_postman_id": "53b75383-2d04-447d-afa6-66194cc68b22",
+		"name": "ChatbotLLM",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27132466"
+	},
+	"item": [
+		{
+			"name": "Initialize Chatbot",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/chatbot/initialize",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"chatbot",
+						"initialize"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "upload File",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"contentType": "text/plain",
+							"type": "file",
+							"src": "Fv5bXdErj/Doctor IPD Assistance App.pdf"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8000/chatbot/upload_file",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"chatbot",
+						"upload_file"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ask Questions",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"question\": \"Who is Scott?\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/chatbot/predict",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"chatbot",
+						"predict"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Clear LLM Context",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/chatbot/clear-context",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"chatbot",
+						"clear-context"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
