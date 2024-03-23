@@ -30,7 +30,7 @@
 
 #### 1. Swagger API 
 
-![alt text](image.png)
+![APIs](https://drive.google.com/file/d/11acjdwRwcqnIu_rrZOJowpU6CfyqDzBV/view?usp=drive_link)
 
 
 * `/chatbot/initialize` - To initialze the ProtonGPT chatbot. 
